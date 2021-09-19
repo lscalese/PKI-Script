@@ -43,6 +43,11 @@ Do:'sc $SYSTEM.Status.DisplayError(sc)
 ; Sign all requested certificate from "client" hostname for 15 minutes : 
 Do ##class(lscalese.pki.Server).SignAllRequestWhile("$server_password$",900,"client") ; could be started with Job command instead "Do"
 ```
+
+`SignAllRequestWhile` method could be used for auto accept requested certificate from an hostname for a time period (default 15 minutes).  
+This is an helper to avoid manual processing on the server portal when executing scripts on client instance.
+
+
 ### Configure the client instance
 
 Open IRIS terminal:
