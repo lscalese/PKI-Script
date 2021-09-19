@@ -1,6 +1,8 @@
-## intersystems-objectscript-template
-This is a template for InterSystems ObjectScript Github repository.
-The template goes also with a few files which let you immedietly compile your ObjecScript files in InterSystems IRIS Community Edition in a docker container
+## PKI-Script
+
+This lib allow to perform steps related to Public Key Infrastructure described in this [community article](https://community.intersystems.com/post/creating-ssl-enabled-mirror-intersystems-iris-using-public-key-infrastructure-pki) without manual intervention.  Could be useful for scripting certificate generation.  
+
+
 
 ## Prerequisites
 Make sure you have [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Docker desktop](https://www.docker.com/products/docker-desktop) installed.
@@ -10,7 +12,7 @@ Make sure you have [git](https://git-scm.com/book/en/v2/Getting-Started-Installi
 Clone/git pull the repo into any local directory
 
 ```
-$ git clone https://github.com/intersystems-community/objectscript-docker-template.git
+$ git clone https://github.com/lscalese/PKI-Script.git
 ```
 
 Open the terminal in this directory and run:
@@ -27,12 +29,45 @@ $ docker-compose up -d
 
 ## How to Test it
 
+### Configure the server instance
+
 Open IRIS terminal:
 
+```bash
+docker exec -it pki-script_iris_1 irissession iris
 ```
-$ docker-compose exec iris iris session iris
-USER>write ##class(dc.PackageSample.ObjectScript).Test()
+
+```Objectscript
+Set sc = ##class(lscalese.pki.Server).MinimalServerConfig("$server_password$", "US", "CASrv", 365)
+Do:'sc $SYSTEM.Status.DisplayError(sc)
+; Sign all requested certificate from "client" hostname for 15 minutes : 
+Do ##class(lscalese.pki.Server).SignAllRequestWhile("$server_password$",900,"client") ; could be started with Job command instead "Do"
 ```
+### Configure the client instance
+
+Open IRIS terminal:
+
+```bash
+docker exec -it pki-script_client_1 irissession iris
+```
+
+```Objectscript
+Set sc = ##class(lscalese.pki.Client).MinimalClientConfig("iris:52773","Contact Name")
+Do:'sc $SYSTEM.Status.DisplayError(sc)
+```
+
+### Request and get a new certificate
+
+```Objectscript
+Set sc = ##class(lscalese.pki.Client).RequestCertificate("$private_key$","US",,##class(lscalese.pki.Client).GenerateFilename()) ; request certificate
+Do:'sc $SYSTEM.Status.DisplayError(sc)
+Set sc = ##class(lscalese.pki.Client).WaitSigning(,,.number) ; Wait Authority server validation...
+Do:'sc $SYSTEM.Status.DisplayError(sc)
+Set sc = ##class(lscalese.pki.Client).GetRequestedCertificate(number)
+Do:'sc $SYSTEM.Status.DisplayError(sc)
+```
+
+
 ## How to start coding
 This repository is ready to code in VSCode with ObjectScript plugin.
 Install [VSCode](https://code.visualstudio.com/), [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) and [ObjectScript](https://marketplace.visualstudio.com/items?itemName=daimor.vscode-objectscript) plugin and open the folder in VSCode.

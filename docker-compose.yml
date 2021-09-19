@@ -4,10 +4,21 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    restart: always
     ports: 
       - 1972
-      - 52773
+      - 45773:52773
       - 53773
     volumes:
       - ./:/irisrun/repo
+    hostname: caserver
+
+  client:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports: 
+      - 46773:52773
+    volumes:
+      - ./:/irisrun/repo
+    hostname: caclient
+  
