@@ -73,6 +73,48 @@ Do:'sc $SYSTEM.Status.DisplayError(sc)
 ```
 
 
+## Helper for mirroring setup
+
+If you use KPI-Script to generate certificate in order to setup a mirror, basically we need to perform these steps on "master" instance :
+
+ * Configure PKI Server.  
+ * Configure PKI Client.  
+ * Request a certificate.  
+ * Wait validation.  
+ * Getting certificate.  
+ * Auto accept certificates requested by futur mirror instances.  
+
+These steps could be resovled with this line : 
+ 
+```Objectscript
+Set sc = ##class(lscalese.pki.Utils).MirrorMaster("$server_password$", "$private_key$", "Contact Person", $lb("US",,,,,$Piece($system,":",1)), 365,"client")
+```
+
+Arguments : 
+ 1. PKI Server Password.
+ 2. Local certificate private key.  
+ 3. Name of the contact person.
+ 4. Listbuild with certifcate attributes (position 1 is the country code and the 6th the common name)
+ 5. Validity in day.
+ 6. List of hostname (other mirror members) to auto accept requested certificates for a period of 1 hour (star "*" could be used to accept all).
+
+On other mirror instances, we need to : 
+
+ * Configure PKI Client.  
+ * Request a certificate.  
+ * Wait validation.  
+ * Getting certificate.  
+
+```Objectscript
+Set sc = ##class(lscalese.pki.Utils).MirrorBackup("iris:52773", "$private_key$", "Contact Person", $lb("US",,,,,$Piece($system,":",1)) )
+```
+
+Arguments : 
+ 1. PKI Server hostname:port.
+ 2. Local certificate private key.  
+ 3. Name of the contact person.
+ 4. Listbuild with certifcate attributes (position 1 is the country code and the 6th the common name).  
+
 ## How to start coding
 This repository is ready to code in VSCode with ObjectScript plugin.
 Install [VSCode](https://code.visualstudio.com/), [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) and [ObjectScript](https://marketplace.visualstudio.com/items?itemName=daimor.vscode-objectscript) plugin and open the folder in VSCode.

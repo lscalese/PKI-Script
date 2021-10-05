@@ -52,6 +52,17 @@ ClassMethod RequestCertificate(privateKeyPassword As %String = {..#DEFAULTPK}, c
     Return sc
 }
 
+ClassMethod RequestCertificateByAttr(privateKeyPassword As %String = {..#DEFAULTPK}, attributes As %List = {$lb("US",,,,,$Piece($system,":",1))}, filename As %String = {..GetDefaultFilename()}, ByRef out As %String = "") As %Status
+{
+    new $NAMESPACE
+    Set $namespace = "%SYS"
+    Set client = ##class(PKI.CAClient).%OpenId(..#CLIENTID)
+    Set out = client.SubmitCSR(filename,attributes,privateKeyPassword,.sc)
+    Write:..#WOUT !,out
+    Do:$$$ISOK(sc) ..SetLastRequestedFilename(filename)
+    Return sc
+}
+
 ClassMethod GetRequestedCertificate(number As %Integer = 0, ByRef out As %String = "") As %Status
 {
     ; Set sc = ##class(lscalese.pki.Client).GetRequestedCertificate()
