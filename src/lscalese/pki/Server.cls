@@ -70,15 +70,16 @@ ClassMethod SignAllRequest(serverPwd As %String = {..GetDefaultPassWord()}, ByRe
 {
     new $NAMESPACE
     Set $namespace = "%SYS"
-    Set key = "", sc = $$$OK, out = "", lowerHost = $$$LOWER(host), lbHosts = $ListFromString(host,",")
+    Set key = "", sc = $$$OK, out = "", lowerHost = $$$LOWER(host), lbHosts = $ListFromString(lowerHost,",")
 
     For  {
         Set key = $Order(^PKI.CSRD(key)), scR = $$$OK, currentHost = $$$LOWER($Piece(key,":",1))
         Quit:key=""
-        If (host="*") || (''$ListFind(lbHosts,lowerHost))
+        If (host="*") || (''$ListFind(lbHosts,currentHost)) {
             Set scR = ..SignRequest(serverPwd,key,.cOut)
             Set out = out _ cOut
             Set:$$$ISERR(scR) sc = $$$ADDSC(sc,scR)
+        }
     }
     Write:..#WOUT !,out
     Return sc
