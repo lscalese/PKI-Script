@@ -41,7 +41,7 @@ docker exec -it pki-script_iris_1 irissession iris
 Set sc = ##class(lscalese.pki.Server).MinimalServerConfig("$server_password$", "US", "CASrv", 365)
 Do:'sc $SYSTEM.Status.DisplayError(sc)
 ; Sign all requested certificate from "client" hostname for 15 minutes : 
-Do ##class(lscalese.pki.Server).SignAllRequestWhile("$server_password$",900,"client") ; could be started with Job command instead "Do"
+Do ##class(lscalese.pki.Server).SignAllRequestWhile("$server_password$",900,"caclient") ; could be started with Job command instead "Do"
 ```
 
 `SignAllRequestWhile` method could be used for auto accept requested certificate from an hostname for a time period (default 15 minutes).  
@@ -87,7 +87,7 @@ If you use KPI-Script to generate certificate in order to setup a mirror, basica
 These steps could be resovled with this line : 
  
 ```Objectscript
-Set sc = ##class(lscalese.pki.Utils).MirrorMaster("$server_password$", "$private_key$", "Contact Person", $lb("US",,,,,$Piece($system,":",1)), 365,"client")
+Set sc = ##class(lscalese.pki.Utils).MirrorMaster("$server_password$", "$private_key$", "Contact Person", $lb("US",,,,,$Piece($system,":",1)), 365,"caclient")
 ```
 
 Arguments : 
